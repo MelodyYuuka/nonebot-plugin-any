@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "nonebot-plugin-any"
+version = "0.0.1"
+description = "NoneBot2 多平台统一事件与统一消息构造发送"
+authors = ["Melody_Yuuka <a876987@126.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "nonebot_plugin_any"}]
+
+[tool.poetry.dependencies]
+python = ">=3.10"
+nonebot2 = ">=2.1.0"
+typing-extensions = ">=4.5.0"
+httpx = ">=0.20.0,<1.0.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
