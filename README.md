@@ -18,20 +18,20 @@
     <img src="https://img.shields.io/github/license/MelodyYuuka/nonebot_plugin_any" alt="license">
   </a>
 
+  <a href="https://pypi.python.org/pypi/nonebot-plugin-any">
+    <img alt="PyPI - Downloads" src="https://img.shields.io/pypi/dm/nonebot-plugin-any">
+  </a>
+
   <a href="https://pypi.python.org/pypi/nonebot_plugin_any">
     <img src="https://img.shields.io/pypi/v/nonebot_plugin_any" alt="pypi">
   </a>
-
-  <a href="https://onebot.dev">
-    <img src="https://img.shields.io/badge/OneBot-11-black" alt="license">
-  </a>
   
   <a href="https://github.com/nonebot/nonebot2">
-    <img src="https://img.shields.io/badge/nonebot2-2.0.0beta.1+-green">
+    <img src="https://img.shields.io/badge/nonebot2-2.1.0+-green">
   </a>
   
   <a href="">
-    <img src="https://img.shields.io/badge/python-3.7+-blue.svg" alt="python">
+    <img src="https://img.shields.io/badge/python-3.10+-blue.svg" alt="python">
   </a>
   
 </p>
