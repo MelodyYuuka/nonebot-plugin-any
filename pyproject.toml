@@ -17,3 +17,7 @@ httpx = ">=0.20.0,<1.0.0"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[project.urls]
+Homepage = "https://github.com/MelodyYuuka/nonebot-plugin-any"
+Repository = "https://github.com/MelodyYuuka/nonebot-plugin-any"

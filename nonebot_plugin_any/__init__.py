@@ -5,7 +5,7 @@ __plugin_meta__ = PluginMetadata(
     description="Nonebot2 多平台统一事件与消息统一构造发送",
     usage="提供多平台统一的事件接口与统一的消息构造发送",
     type="library",
-    homepage="https://github.com/MelodyYuuka/nonebot_plugin_any",
+    homepage="https://github.com/MelodyYuuka/nonebot-plugin-any",
     supported_adapters={"~onebot.v11", "~qqguild", "~kaiheila"},
 )
 
