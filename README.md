@@ -8,7 +8,7 @@
   
 # nonebot_plugin_any
 
-🐝 [Nonebot2](https://github.com/nonebot/nonebot2) 多平台事件与消息构造发送🍥
+🐝 [Nonebot2](https://github.com/nonebot/nonebot2) 多平台事件与消息构造发送 🐝
   
 </div>
 
