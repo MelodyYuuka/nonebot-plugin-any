@@ -130,7 +130,7 @@ AnyMsg("12345") + "67890"
 
 - 本插件原本是 [`YuukaBot`](https://github.com/MelodyYuuka/YuukaBot-docs) 的功能之一，经魔法修改适配 `NoneBot2` 后在 `NoneBot2` 平台上作为插件。
 
-- 本插件仍处于开发阶段，若有需要的特性，欢迎提 issue 与 pr
+- 本插件仍处于开发阶段，若有需要的特性或新平台支持，欢迎提 issue 与 pr
 
 ## 开源许可
 
