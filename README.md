@@ -86,7 +86,6 @@ nonebot.load_plugin("nonebot_plugin_any")
 |    Kook (开黑啦)    |   ✅   |  ✅  |  ✅  |  🟨  |  ✅  |
 | QQ频道 (deprecated) |   ✅   |  ✅  |  ✅  |  🟨  |  ⚠️  |
 
-
 ## 使用
 
 ```python
@@ -97,7 +96,7 @@ from nonebot.adapter import Bot as BaseBot
 # 导入依赖
 require("nonebot_plugin_any")
 
-from plugins.nonebot_plugin_any import AnyMsgEvent, AnyGroupMsgEvent, AnyMsg, Platform
+from nonebot_plugin_any import AnyMsgEvent, AnyGroupMsgEvent, AnyMsg, Platform
 
 test = on_command("/ping", priority=1000)
 
