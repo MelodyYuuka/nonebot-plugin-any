@@ -14,6 +14,7 @@ __plugin_meta__ = PluginMetadata(
     supported_adapters={
         "~onebot.v11",
         # "~qqguild",
+        "~qq",
         "~kaiheila",
     },
 )
