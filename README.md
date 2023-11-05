@@ -44,6 +44,12 @@
 
 同时也提供了 `AnyMsg`，来提供一套接口即可发送跨平台消息的能力，只需构造一次 `AnyMsg` 即可编译成各平台消息，使您的插件结构更为清晰优雅。
 
+## 特性
+
+- 简单便捷的依赖注入支持
+- 跨平台的 **统一事件接收接口** 与 **统一消息构造发送接口**
+- 与 `NoneBot2` 消息处理流程行为一致
+
 ## 安装载入
 
 - 通过 pip 或 nb-cli 安装
@@ -60,6 +66,7 @@ nb plugin install nonebot-plugin-any
 
 ```python
 nonebot.load_plugin("nonebot_plugin_any")
+# 如果可能，最好将本插件在其他插件之前载入
 ```
 
 ## 目前支持
@@ -119,6 +126,7 @@ AnyMsg("12345") + AnyMsg("67890")
 
 # 也可以这样连接
 AnyMsg("12345").text("67890")
+AnyMsg("aaa").image(Path("bbb.png")).text("ccc")
 
 # 还可以这样连接
 AnyMsg("12345") + "67890"
