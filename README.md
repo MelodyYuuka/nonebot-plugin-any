@@ -93,7 +93,7 @@ test = on_command("/ping", priority=1000)
 
 
 @test.handle()
-async def _(event: AnyMsgEvent):  # 接收多平台消息事件
+async def _(event: AnyMsgEvent):  # 简单的依赖注入支持
     await AnyMsg("AnyMsgEvent pong!").send(at=True, reply=True) # 原生适配发送时 at 和 reply
 
 @test.handle()
