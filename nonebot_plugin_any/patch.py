@@ -1,5 +1,5 @@
 import inspect
-from typing import Any, Optional, Self, cast
+from typing import Any, Optional, cast
 
 from nonebot.adapters import Event
 from nonebot.dependencies import CustomConfig, Param
@@ -10,7 +10,7 @@ from nonebot.rule import Rule
 from nonebot.typing import T_State
 from nonebot.utils import generic_check_issubclass
 from pydantic.fields import ModelField, Required
-from typing_extensions import override
+from typing_extensions import Self, override
 
 from . import AnyEvent
 

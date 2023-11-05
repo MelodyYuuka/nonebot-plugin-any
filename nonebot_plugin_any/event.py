@@ -7,8 +7,8 @@ from pathlib import Path
 from types import GenericAlias
 from typing import Any, ClassVar, Generic, TypeVar, get_args, get_origin
 
-from nonebot import logger
 from nonebot.adapters import Event, Message, MessageSegment
+from nonebot.log import logger
 
 from .utils import Platform, class_cmp
 

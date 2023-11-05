@@ -2,13 +2,14 @@ import abc
 from dataclasses import dataclass
 from io import BytesIO
 from pathlib import Path
-from typing import Any, ClassVar, Generic, Literal, NoReturn, Self, TypeVar, Union
+from typing import Any, ClassVar, Generic, Literal, NoReturn, TypeVar, Union
 
 from nonebot.adapters import Bot as BaseBot
 from nonebot.adapters import Event as BaseEvent
 from nonebot.adapters import Message as BaseMsg
 from nonebot.exception import FinishedException
 from nonebot.matcher import current_bot, current_event
+from typing_extensions import Self
 
 from .utils import NotSupportException, Platform, get_current_platform
 
