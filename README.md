@@ -6,7 +6,7 @@
 
 <div align="center">
   
-# nonebot_plugin_any
+# nonebot-plugin-any
 
 🐝 [Nonebot2](https://github.com/nonebot/nonebot2) 多平台统一事件与统一消息构造发送 🐝
   
@@ -93,6 +93,8 @@ async def _(bot: BaseBot, event: AnyMsgEvent):
 
 @test.handle()
 async def _(event: AnyGroupMsgEvent): # 接收多平台群消息事件
+    print(event.user_id)  # 各平台统一一个接口
+    print(event.image)  # 便捷获取消息内图片链接
     await AnyMsg("AnyGroupMsgEvent pong!").finish() # 与 matcher.finish(xxx) 行为一致
 
 ```
@@ -111,8 +113,12 @@ AnyMsg("12345") + "67890"
 "12345" + AnyMsg("67890")
 ```
 
-## 开源许可
+## 完善
 
 - 本插件原本是 [`YuukaBot`](https://github.com/MelodyYuuka/YuukaBot-docs) 的功能之一，经魔法修改适配 `NoneBot2` 后在 `NoneBot2` 平台上作为插件。
+
+- 本插件仍处于开发阶段，若有需要的特性，欢迎提 issue 与 pr
+
+## 开源许可
 
 - 本插件使用 `MIT` 许可证开源。
