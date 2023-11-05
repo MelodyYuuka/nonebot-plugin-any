@@ -129,6 +129,11 @@ class AnyMsgEvent(AnyEvent[TE]):
     def reply(self) -> Any | None:
         "回复"
         raise NotImplementedError
+    
+    @property
+    def user_rich_id(self) -> str:
+        "含平台名的用户 id"
+        return f"{self.platform.name}-{self.user_id}"
 
 
 class AnyGroupEvent(AnyEvent[TE]):
