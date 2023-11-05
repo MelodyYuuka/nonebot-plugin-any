@@ -1,18 +1,17 @@
 from typing import Any, cast
 
-from nonebot.adapters.kaiheila import Bot, Event, Adapter
+from nonebot.adapters.kaiheila import Adapter, Bot, Event
 from nonebot.adapters.kaiheila import Message as KookMsg
 from nonebot.adapters.kaiheila import MessageSegment as KookMsgSeg
-from nonebot.adapters.kaiheila.api import Channel, Guild
 from nonebot.adapters.kaiheila.event import ChannelMessageEvent, MessageEvent
 from nonebot.matcher import current_bot
 from typing_extensions import override
 
 from .. import AnyGroupMsgEvent, AnyMsgEvent
 from ..message import AnyMsgHandler, AnyMsgSeg
+from ..models import Group, User
 from ..utils import Platform, get_platform_bot, register_platform
 from ..utils.requests import Requests
-
 
 register_platform(Platform.KOOK, Bot, Adapter)
 
@@ -45,10 +44,11 @@ class MsgEvent(AnyMsgEvent[MessageEvent]):
         ]
 
     @override
-    async def get_user_info(self):
+    async def get_user_info(self) -> User:
         if not self._user_info:
             bot = cast(Bot, current_bot.get())
-            self._user_info = await bot.user_view(user_id=self.user_id)
+            info = await bot.user_view(user_id=self.user_id)
+            self._user_info = User(info.id_ or "", info.username or "", info.avatar)
         return self._user_info
 
     @override
@@ -73,19 +73,19 @@ class GroupMsgEvent(AnyGroupMsgEvent[ChannelMessageEvent], MsgEvent):  # type: i
         return self.event.group_id
 
     @override
-    async def get_group_info(self) -> Guild:
+    async def get_group_info(self) -> Group:
         if not self._group_info:
             bot = cast(Bot, current_bot.get())
-            self._group_info = await bot.guild_view(
-                guild_id=cast(str, self.event.extra.guild_id)
-            )
+            info = await bot.guild_view(guild_id=cast(str, self.event.extra.guild_id))
+            self._group_info = Group(info.id_ or "", info.name or "", info.icon, info.user_id, None, None)
         return self._group_info
 
     @override
-    async def get_channel_info(self) -> Channel:
+    async def get_channel_info(self) -> Group:
         if not self._channel_info:
             bot = cast(Bot, current_bot.get())
-            self._channel_info = await bot.channel_view(target_id=self.channel_id)
+            info = await bot.channel_view(target_id=self.channel_id)
+            self._channel_info = Group(info.id_ or "", info.name or "", None, info.user_id, None, info.limit_amount)
         return self._channel_info
 
     @override

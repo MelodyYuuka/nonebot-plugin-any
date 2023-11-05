@@ -1,16 +1,14 @@
 import abc
-import importlib
 import inspect
 from collections import defaultdict
-from functools import cmp_to_key
-from pathlib import Path
 from types import GenericAlias
 from typing import Any, ClassVar, Generic, TypeVar, get_args, get_origin
 
 from nonebot.adapters import Event, Message, MessageSegment
 from nonebot.log import logger
 
-from .utils import Platform, class_cmp
+from .models import Group, User
+from .utils import Platform
 
 TE = TypeVar("TE", bound=Event)
 
@@ -56,7 +54,7 @@ class AnyEvent(abc.ABC, Generic[TE]):
 
     def __init__(self, event: TE) -> None:
         self.event = event
-        self._user_info = None
+        self._user_info: User | None = None
         super().__init__()
 
     @classmethod
@@ -115,21 +113,21 @@ class AnyMsgEvent(AnyEvent[TE]):
         raise NotImplementedError
 
     @abc.abstractmethod
-    async def get_user_info(self) -> Any:
-        "用户信息，各平台实现不同"
+    async def get_user_info(self) -> User:
+        "用户信息"
         raise NotImplementedError
 
     @abc.abstractmethod
-    async def get_avatar_url(self) -> str:
+    async def get_avatar_url(self) -> str | None:
         "用户头像链接"
         raise NotImplementedError
 
     @property
     @abc.abstractmethod
     def reply(self) -> Any | None:
-        "回复"
+        "回复，各平台实现不同"
         raise NotImplementedError
-    
+
     @property
     def user_rich_id(self) -> str:
         "含平台名的用户 id"
@@ -145,17 +143,17 @@ class AnyGroupEvent(AnyEvent[TE]):
     """
 
     def __init__(self, event: TE) -> None:
-        self._group_info = None
-        self._channel_info = None
+        self._group_info: Group | None = None
+        self._channel_info: Group | None = None
         super().__init__(event)
 
     @abc.abstractmethod
-    async def get_group_info(self) -> Any:
+    async def get_group_info(self) -> Group:
         "群聊信息，各平台实现不同"
         raise NotImplementedError
 
     @abc.abstractmethod
-    async def get_channel_info(self) -> Any:
+    async def get_channel_info(self) -> Group:
         "子频道信息，各平台实现不同"
         raise NotImplementedError
 
@@ -199,20 +197,3 @@ class AnyGroupMsgEvent(AnyMsgEvent[TE], AnyGroupEvent[TE]):
         任意群聊消息事件 基类
 
     """
-
-
-for module_path in (Path(__file__).parent / "adapters").iterdir():
-    try:
-        if module_path.is_dir():
-            continue
-        importlib.import_module(f"{__package__}.adapters.{module_path.stem}")
-        logger.opt(colors=True).success(
-            f"Successfully loaded AnyAdapter <y>{module_path.stem}</y>"
-        )
-    except ImportError:
-        pass
-
-for anycls, map in AnyEvent._event_map.items():
-    sublist = list(map.keys())
-    sublist.sort(key=cmp_to_key(class_cmp))
-    AnyEvent._subevent_list[anycls] = sublist

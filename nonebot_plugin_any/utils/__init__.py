@@ -8,6 +8,7 @@ from nonebot.adapters import Adapter as BaseAdapter
 from nonebot.adapters import Bot as BaseBot
 from nonebot.matcher import current_bot
 
+OneParam = TypeVar("OneParam", bound=Any)
 Param = ParamSpec("Param")
 Return = TypeVar("Return", bound=Any)
 
@@ -22,7 +23,12 @@ class Platform(Enum):
 
     OneBotV11 = auto()
     KOOK = auto()
+    QQ = auto()
     QQGuild = auto()
+
+
+def call_or_none(func: Callable[[OneParam], Return], param: OneParam) -> Return | None:
+    return None if param is None else func(param)
 
 
 def class_cmp(cls1: type, cls2: type):

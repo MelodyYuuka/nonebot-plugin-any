@@ -1,24 +1,29 @@
 from pathlib import Path
 from typing import Any, cast
 
-from nonebot.adapters.qqguild import Adapter, Bot
-from nonebot.adapters.qqguild import Message as GuildMsg
-from nonebot.adapters.qqguild import MessageSegment as GuildMsgSeg
-from nonebot.adapters.qqguild.api import MessageGet
-from nonebot.adapters.qqguild.event import MessageCreateEvent, MessageEvent
+from nonebot.adapters.qq import Adapter, Bot
+from nonebot.adapters.qq import Message as GuildMsg
+from nonebot.adapters.qq import MessageSegment as GuildMsgSeg
+from nonebot.adapters.qq.event import (
+    GroupAtMessageCreateEvent,
+    GuildMessageEvent,
+    MessageCreateEvent,
+    MessageEvent,
+)
+from nonebot.adapters.qq.models.guild import Message as MsgModel
 from nonebot.matcher import current_bot
 from typing_extensions import override
 
 from .. import AnyGroupMsgEvent, AnyMsgEvent
 from ..message import AnyMsgHandler, AnyMsgSeg
 from ..models import Group, User
-from ..utils import Platform, call_or_none, register_platform
+from ..utils import Platform, register_platform
 
-register_platform(Platform.QQGuild, Bot, Adapter)
+register_platform(Platform.QQ, Bot, Adapter)
 
 
 class MsgEvent(AnyMsgEvent[MessageEvent]):
-    platform = Platform.QQGuild
+    platform = Platform.QQ
 
     @property
     @override
@@ -28,7 +33,9 @@ class MsgEvent(AnyMsgEvent[MessageEvent]):
     @property
     @override
     def name(self) -> str:
-        return self.event.author.username  # type: ignore
+        if isinstance(self.event, GuildMessageEvent):
+            return self.event.author.username or ""
+        return ""
 
     @property
     @override
@@ -46,42 +53,76 @@ class MsgEvent(AnyMsgEvent[MessageEvent]):
 
     @override
     async def get_user_info(self) -> User:
-        if not self._user_info:
-            assert self.event.author
-            self._user_info = User(self.user_id, self.name, await self.get_avatar_url())
-        return self._user_info
+        if isinstance(self.event, GuildMessageEvent):
+            return User(
+                self.event.author.id,
+                self.event.author.username or "",
+                self.event.author.avatar,
+            )
+        else:
+            return User(self.event.get_user_id())
 
     @override
-    async def get_avatar_url(self) -> str:
-        return self.event.author.avatar  # type: ignore
+    async def get_avatar_url(self) -> str | None:
+        if isinstance(self.event, GuildMessageEvent):
+            return self.event.author.avatar
+        else:
+            return None
 
     @property
     @override
-    def reply(self) -> MessageGet | None:
+    def reply(self) -> MsgModel | None:
         return self.event.reply
 
 
-class GroupMsgEvent(AnyGroupMsgEvent[MessageCreateEvent], MsgEvent):  # type: ignore
+class GroupMsgEvent(AnyGroupMsgEvent[GroupAtMessageCreateEvent], MsgEvent):  # type: ignore
     @property
     @override
     def group_id(self) -> str:
-        return self.event.guild_id  # type: ignore
+        return self.event.group_id
 
     @property
     @override
     def channel_id(self) -> str:
-        return self.event.channel_id  # type: ignore
+        return self.event.group_id
+
+    @override
+    async def get_group_info(self) -> Group:
+        return Group(self.group_id)
+
+    async def get_channel_info(self) -> Group:
+        return await self.get_group_info()
+
+    @override
+    async def get_group_name(self) -> str:
+        return ""
+
+    @override
+    async def get_channel_name(self) -> str:
+        return ""
+
+
+class GuildMsgEvent(AnyGroupMsgEvent[MessageCreateEvent], MsgEvent):  # type: ignore
+    @property
+    @override
+    def group_id(self) -> str:
+        return self.event.guild_id
+
+    @property
+    @override
+    def channel_id(self) -> str:
+        return self.event.channel_id
 
     @override
     async def get_group_info(self) -> Group:
         if not self._group_info:
             bot = cast(Bot, current_bot.get())
-            info = await bot.get_guild(guild_id=int(self.group_id))
+            info = await bot.get_guild(guild_id=self.group_id)
             self._group_info = Group(
-                str(info.id or ""),
-                info.name or "",
+                info.id,
+                info.name,
                 info.icon,
-                call_or_none(str, info.owner_id),
+                info.owner_id,
                 info.member_count,
                 info.max_members,
             )
@@ -90,28 +131,23 @@ class GroupMsgEvent(AnyGroupMsgEvent[MessageCreateEvent], MsgEvent):  # type: ig
     async def get_channel_info(self) -> Group:
         if not self._channel_info:
             bot = cast(Bot, current_bot.get())
-            info = await bot.get_channel(channel_id=int(self.channel_id))
+            info = await bot.get_channel(channel_id=self.channel_id)
             self._channel_info = Group(
-                str(info.id or ""),
-                info.name or "",
-                None,
-                call_or_none(str, info.owner_id),
-                None,
-                None,
+                info.id, info.name, None, info.owner_id, None, None
             )
         return self._channel_info
 
     @override
     async def get_group_name(self) -> str:
-        return (await self.get_group_info()).name or ""
+        return (await self.get_group_info()).name
 
     @override
     async def get_channel_name(self) -> str:
-        return (await self.get_channel_info()).name or ""
+        return (await self.get_channel_info()).name
 
 
 class MsgHandler(AnyMsgHandler[Bot, MessageEvent, GuildMsg]):
-    platform = Platform.QQGuild
+    platform = Platform.QQ
 
     @override
     @classmethod

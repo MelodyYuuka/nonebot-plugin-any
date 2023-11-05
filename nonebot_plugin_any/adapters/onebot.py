@@ -1,6 +1,6 @@
 from typing import Any, Literal, cast
 
-from nonebot.adapters.onebot.v11 import Bot, Event, GroupMessageEvent, Adapter
+from nonebot.adapters.onebot.v11 import Adapter, Bot, Event, GroupMessageEvent
 from nonebot.adapters.onebot.v11 import Message as QQMsg
 from nonebot.adapters.onebot.v11 import MessageEvent
 from nonebot.adapters.onebot.v11 import MessageSegment as QQMsgSeg
@@ -10,8 +10,8 @@ from typing_extensions import override
 
 from .. import AnyGroupMsgEvent, AnyMsgEvent
 from ..message import AnyMsgHandler, AnyMsgSeg
+from ..models import Group, User
 from ..utils import Platform, register_platform
-
 
 register_platform(Platform.OneBotV11, Bot, Adapter)
 
@@ -58,8 +58,15 @@ class MsgEvent(AnyMsgEvent[MessageEvent]):
         ]
 
     @override
-    async def get_user_info(self):
-        return self.event.sender
+    async def get_user_info(self) -> User:
+        if not self._user_info:
+            sender = self.event.sender
+            self._user_info = User(
+                str(sender.user_id or ""),
+                sender.nickname or "",
+                await self.get_avatar_url(),
+            )
+        return self._user_info
 
     @override
     async def get_avatar_url(self) -> str:
@@ -87,35 +94,40 @@ class GroupMsgEvent(AnyGroupMsgEvent[GroupMessageEvent], MsgEvent):  # type: ign
         return str(self.event.group_id)
 
     @override
-    async def get_group_info(self) -> dict[str, Any]:
+    async def get_group_info(self) -> Group:
         if not self._group_info:
             bot = cast(Bot, current_bot.get())
-            self._group_info = self._channel_info = await bot.get_group_info(
-                group_id=self.event.group_id
+            info = await bot.get_group_info(group_id=self.event.group_id)
+            self._group_info = Group(
+                str(info["group_id"]),
+                info["group_name"],
+                await self.get_group_icon(),
+                None,
+                info["member_count"],
+                info["max_member_count"],
             )
         return self._group_info
 
+    async def get_group_icon(self) -> str:
+        group_id = self.group_id
+        return f"https://p.qlogo.cn/gh/{group_id}/{group_id}/640"
+
     @override
-    async def get_channel_info(self) -> dict[str, Any]:
-        if not self._channel_info:
-            bot = cast(Bot, current_bot.get())
-            self._group_info = self._channel_info = await bot.get_group_info(
-                group_id=self.event.group_id
-            )
-        return self._channel_info
+    async def get_channel_info(self) -> Group:
+        return await self.get_group_info()
 
     @override
     async def get_group_name(self) -> str:
-        return (await self.get_group_info())["group_name"]
+        return (await self.get_group_info()).name
 
     @override
     async def get_channel_name(self) -> str:
-        return (await self.get_group_info())["group_name"]
+        return await self.get_group_name()
 
 
 class MsgHandler(AnyMsgHandler[Bot, Event, QQMsg]):
     platform = Platform.OneBotV11
-    
+
     @override
     @classmethod
     async def build(cls, msg: list[AnyMsgSeg]) -> list[QQMsg]:

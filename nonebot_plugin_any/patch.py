@@ -19,6 +19,9 @@ ANYEVENT_TARGET = "_any_event"
 
 class AnyEventParam(Param):
     """`AnyEvent` 参数"""
+    def __init__(self, *args, validate: bool = False, **kwargs: Any) -> None:
+        self.any_cls: type[AnyEvent] = kwargs["checker"].type_
+        super().__init__(*args, validate=validate, **kwargs)
 
     def __repr__(self) -> str:
         return (
@@ -56,7 +59,7 @@ class AnyEventParam(Param):
     @override
     async def _check(self, event: "Event", state: T_State, **kwargs: Any) -> Any:
         if not (any_event := state[ANYEVENT_TARGET]):
-            any_event = state[ANYEVENT_TARGET] = AnyEvent.solve(event)
+            any_event = state[ANYEVENT_TARGET] = self.any_cls.solve(event)
         if checker := self.extra.get("checker", None):
             check_field_type(checker, any_event)
 
