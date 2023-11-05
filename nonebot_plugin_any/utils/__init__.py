@@ -1,5 +1,5 @@
 import asyncio
-from enum import StrEnum, auto
+from enum import Enum, auto
 from functools import wraps
 from typing import Any, Callable, Coroutine, ParamSpec, TypeVar
 
@@ -12,7 +12,7 @@ Param = ParamSpec("Param")
 Return = TypeVar("Return", bound=Any)
 
 
-class Platform(StrEnum):
+class Platform(Enum):
     """
     说明：
 
